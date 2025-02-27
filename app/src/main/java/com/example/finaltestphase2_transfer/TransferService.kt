@@ -2,11 +2,14 @@ package com.example.finaltestphase2_transfer
 
 import android.app.Service
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.SharedPreferences
 import android.os.IBinder
 import android.util.Log
 import com.example.finaltestphase2_ui.IStudentUI
+import com.google.gson.Gson
 
 
 class TransferService : Service() {
@@ -39,23 +42,25 @@ class TransferService : Service() {
 
         when (command) {
             "requestFirst100" -> {
-                Log.d("TransferAppService", "Requesting First 100 students")
-                // Do something here
-                val first100 = aidlUI?.get100Students()
-                Log.d(
-                    "TransferService",
-                    "onStartCommand: ${aidlUI?.get100Students()?.firstOrNull()}"
-                )
+                val first100student = aidlUI?.get100Students()
+                if(first100student!=null){
+                    saveToSharedPreferences("requestFirst100",first100student)
+                    Log.d("TransferAppService", "Requesting First 100 students")
+                    // Do something here
+                    Log.d(
+                        "TransferService",
+                        "onStartCommand: ${aidlUI?.get100Students()?.firstOrNull()}"
+                    )
+                }
+
             }
 
             "request10BySubject" -> {
                 val subject = intent?.getStringExtra("subject") ?: ""
                 if (subject.isNotEmpty()) {
                     Log.d("TransferAppService", "Requesting 10 students by subject: $subject")
-
-                    //
-//                    request10BySubjectAsync(subject = subject)
-
+                    val result = aidlUI?.getTop10StudentByNameAndScore(subject)
+                    Log.d("TransferService","onStartCommand: $result")
 
                 } else {
                     Log.d("TransferAppService", "No subject provided")
@@ -102,6 +107,20 @@ class TransferService : Service() {
         }
 
         return START_STICKY
+    }
+
+    private fun saveToSharedPreferences(key: String, value: Any) {
+        val sharedPreferences: SharedPreferences = applicationContext.getSharedPreferences("TransferServicePrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // Chuyển đối tượng thành JSON string
+        val json = Gson().toJson(value)
+
+        // Lưu JSON string vào SharedPreferences
+        editor.putString(key, json)
+        editor.apply()
+
+        Log.d("TransferService", "Saved $key to SharedPreferences: $json")
     }
 
     override fun onBind(intent: Intent): IBinder? {
