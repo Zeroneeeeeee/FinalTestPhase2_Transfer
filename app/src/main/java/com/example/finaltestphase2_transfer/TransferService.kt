@@ -68,11 +68,27 @@ class TransferService : Service() {
             }
 
             "request10BySumA" -> {
-                Log.d("TransferAppService", "Requesting 10 students by SumA")
+                val city = intent?.getStringExtra("city") ?: ""
+                if (city.isNotEmpty()) {
+                    Log.d("TransferAppService", "Requesting 10 students have the highest sum A by city : $city")
+                    val result = aidlUI?.getTop10StudentsByScoreA(city)
+                    Log.d("TransferService","onStartCommand: $result")
+
+                } else {
+                    Log.d("TransferAppService", "No subject provided")
+                }
             }
 
             "request10BySumB" -> {
-                Log.d("TransferAppService", "Requesting 10 students by SumB")
+                val city = intent?.getStringExtra("city") ?: ""
+                if (city.isNotEmpty()) {
+                    Log.d("TransferAppService", "Requesting 10 students have the highest sum B by city : $city")
+                    val result = aidlUI?.getTop10StudentsByScoreB(city)
+                    Log.d("TransferService","onStartCommand: $result")
+
+                } else {
+                    Log.d("TransferAppService", "No subject provided")
+                }
             }
 
             "requestStudent" -> {

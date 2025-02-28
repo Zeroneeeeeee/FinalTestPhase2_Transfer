@@ -7,4 +7,6 @@ interface IStudentUI {
     List<Student> getTop10StudentByNameAndScore(String subjectName);
     List<Student> getTop10StudentsByScoreA(String city);
     List<Student> getTop10StudentsByScoreB(String city);
+    List<Student> searchStudent(String name, String city);
+    Student getStudentByID(int id);
 }
